@@ -6,7 +6,7 @@
     <title>NFL +EV Prop Scanner</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white font-sans p-6">
+<body class="bg-gray-900 text-white font-sans p-4 md:p-6">
     <div class="max-w-5xl mx-auto">
         <h1 class="text-3xl font-bold mb-6 text-emerald-400">NFL +EV Prop Scanner</h1>
 
@@ -19,14 +19,30 @@
 
         <!-- Dashboard Section -->
         <div id="dashboard" class="hidden">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <div class="flex items-center">
-                    <button onclick="scanSlate()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded shadow-lg transition-transform transform hover:scale-105">
+            
+            <!-- Controls Container -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-700 pb-6">
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+                    <button onclick="scanSlate()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded shadow-lg transition-transform transform hover:scale-105 w-full md:w-auto">
                         Scan NFL Slate
                     </button>
-                    <button onclick="clearApiKey()" class="text-sm text-gray-400 underline hover:text-white ml-4">Change API Key</button>
+                    
+                    <!-- Dynamic Timeframe Toggle -->
+                    <div class="flex items-center gap-2 bg-gray-800 border border-gray-600 px-3 py-2 rounded w-full md:w-auto justify-between">
+                        <label for="time-window" class="text-sm text-gray-300 font-bold whitespace-nowrap">Kickoff Window:</label>
+                        <select id="time-window" class="bg-gray-700 text-white text-sm rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                            <option value="12">Next 12 Hours</option>
+                            <option value="24" selected>Next 24 Hours</option>
+                            <option value="48">Next 48 Hours</option>
+                            <option value="999">All Upcoming (High Cost)</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="status-text" class="text-gray-400 font-mono text-sm animate-pulse">Waiting to scan...</div>
+                
+                <div class="flex flex-col items-end gap-2 w-full md:w-auto">
+                    <div id="status-text" class="text-gray-400 font-mono text-sm animate-pulse md:text-right">Waiting to scan...</div>
+                    <button onclick="clearApiKey()" class="text-xs text-gray-500 underline hover:text-white">Change API Key</button>
+                </div>
             </div>
 
             <!-- Filter Buttons -->
@@ -39,13 +55,13 @@
             </div>
 
             <!-- Results Grid -->
-            <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Cards will be injected here via JavaScript -->
             </div>
         </div>
     </div>
 
-    <!-- NFL Script Cache Buster -->
-    <script src="app.js?v=1"></script>
+    <!-- Cache Buster -->
+    <script src="app.js?v=3"></script>
 </body>
 </html>

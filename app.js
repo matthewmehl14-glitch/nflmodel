@@ -6,7 +6,6 @@ function getFairProbability(oddsOver, oddsUnder) {
     let probOver = oddsOver > 0 ? 100 / (oddsOver + 100) : Math.abs(oddsOver) / (Math.abs(oddsOver) + 100);
     let probUnder = oddsUnder > 0 ? 100 / (oddsUnder + 100) : Math.abs(oddsUnder) / (Math.abs(oddsUnder) + 100);
     let vig = probOver + probUnder;
-    // Return an object containing fair probabilities for BOTH sides
     return {
         'Over': probOver / vig,
         'Under': probUnder / vig
@@ -103,8 +102,6 @@ function appendResultCard(play) {
     if (unitSize > 2.00) unitSize = 2.00;
     
     const kellyText = fullKelly > 0 ? `${unitSize.toFixed(2)}u` : "0.00u";
-
-    // Dynamic color coding for Over vs Under
     const betColor = play.betType === 'Over' ? 'text-emerald-400' : 'text-rose-400';
 
     const card = document.createElement("div");
@@ -146,6 +143,10 @@ async function scanSlate() {
     document.getElementById("results-grid").innerHTML = ""; 
     globalPlays = []; 
     
+    // Read the dropdown value from the UI
+    const timeWindowElement = document.getElementById("time-window");
+    const maxHoursAhead = timeWindowElement ? parseInt(timeWindowElement.value) : 24;
+    
     const targetBookmakers = "pinnacle,williamhill_us,draftkings,fanatics,fanduel,novig,espnbet,betmgm";
     const marketsToScan = "player_pass_yds,player_rush_yds,player_reception_yds,player_receptions";
     
@@ -159,11 +160,22 @@ async function scanSlate() {
         }
         
         const currentTime = new Date(); 
+        let gamesScanned = 0;
         
         for (const game of events) {
             const gameDate = new Date(game.commence_time);
+            
+            // Skip games already started or finished
             if (gameDate < currentTime) continue; 
             
+            // Dynamic Kickoff Filter based on the UI dropdown
+            const hoursUntilKickoff = (gameDate - currentTime) / (1000 * 60 * 60);
+            if (hoursUntilKickoff > maxHoursAhead) {
+                console.log(`Skipping ${game.away_team} @ ${game.home_team} (${hoursUntilKickoff.toFixed(1)}h until kickoff > ${maxHoursAhead}h window)`);
+                continue; 
+            }
+            
+            gamesScanned++;
             updateStatus(`Analyzing: ${game.away_team} @ ${game.home_team}...`);
             const timeString = gameDate.toLocaleTimeString('en-US', { timeZone: 'America/Chicago', weekday: 'short', hour: 'numeric', minute: '2-digit', hour12: true });
             
@@ -219,7 +231,6 @@ async function scanSlate() {
                     const fd = lines.fanduel;
                     const pinny = lines.pinnacle;
                     
-                    // Evaluate BOTH Over and Under for EV
                     for (const betType of ['Over', 'Under']) {
                         let targetLine = null;
                         let fairProb = null;
@@ -244,7 +255,6 @@ async function scanSlate() {
                         let bestRetailBook = "";
                         
                         for (const [retailBookName, retailLines] of Object.entries(lines.retail)) {
-                            // Find matching target line across other books
                             if (retailLines[betType] && retailLines[betType].point === targetLine) {
                                 if (retailLines[betType].price > bestRetailOdds) {
                                     bestRetailOdds = retailLines[betType].price;
@@ -255,7 +265,6 @@ async function scanSlate() {
                         
                         if (bestRetailOdds === -Infinity) continue; 
                         
-                        // Calculate Edge
                         const retailProb = bestRetailOdds > 0 ? 100 / (bestRetailOdds + 100) : Math.abs(bestRetailOdds) / (Math.abs(bestRetailOdds) + 100);
                         const edge = fairProb - retailProb;
                         
@@ -280,7 +289,7 @@ async function scanSlate() {
 
         globalPlays.sort((a, b) => b.edge - a.edge);
         renderCards();
-        updateStatus(`NFL Scan complete. Found ${globalPlays.length} premium +EV plays.`);
+        updateStatus(`NFL Scan complete. Analyzed ${gamesScanned} game(s) within ${maxHoursAhead}h. Found ${globalPlays.length} play(s).`);
     } catch (error) {
         updateStatus(`Error: ${error.message}`);
         document.getElementById("results-grid").innerHTML = `

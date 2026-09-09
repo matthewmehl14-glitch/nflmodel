@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFL +EV Prop Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans p-6">
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-emerald-400">NFL +EV Prop Scanner</h1>
+
+        <!-- API Setup Section -->
+        <div id="setup-panel" class="bg-gray-800 p-6 rounded-lg mb-6 border border-gray-700">
+            <h2 class="text-xl mb-4">API Setup</h2>
+            <input type="password" id="api-key-input" placeholder="Enter The Odds API Key" class="bg-gray-700 text-white px-4 py-2 rounded w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <button onclick="saveApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded mt-4 md:mt-0 md:ml-2">Save Key & Start</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <div class="flex items-center">
+                    <button onclick="scanSlate()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded shadow-lg transition-transform transform hover:scale-105">
+                        Scan NFL Slate
+                    </button>
+                    <button onclick="clearApiKey()" class="text-sm text-gray-400 underline hover:text-white ml-4">Change API Key</button>
+                </div>
+                <div id="status-text" class="text-gray-400 font-mono text-sm animate-pulse">Waiting to scan...</div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="mb-6 flex gap-2 flex-wrap" id="filters">
+                <button onclick="filterResults('all')" class="bg-blue-600 px-3 py-1 rounded text-sm hover:bg-blue-500 transition-colors" id="btn-all">All Plays</button>
+                <button onclick="filterResults('player_pass_yds')" class="bg-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors" id="btn-player_pass_yds">Passing Yds</button>
+                <button onclick="filterResults('player_rush_yds')" class="bg-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors" id="btn-player_rush_yds">Rushing Yds</button>
+                <button onclick="filterResults('player_reception_yds')" class="bg-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors" id="btn-player_reception_yds">Receiving Yds</button>
+                <button onclick="filterResults('player_receptions')" class="bg-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors" id="btn-player_receptions">Receptions</button>
+            </div>
+
+            <!-- Results Grid -->
+            <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Cards will be injected here via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- NFL Script Cache Buster -->
+    <script src="app.js?v=1"></script>
+</body>
+</html>
